@@ -242,9 +242,9 @@
         "text_position": "center",
         "text_alignment": "start",
         "heading_color": "#000000",
-        "background_color": "#FFFFFF",
+        "background_color": "#ffffff",
         "text_background_light": "rgba(0,0,0,0)",
-        "color_line": "#E3E3E3",
+        "color_line": "#e3e3e3",
         "image_alignment": "md:flex-row",
         "full_width": true,
         "padding_full_width": false,
@@ -257,6 +257,12 @@
         "top_padding_mobile": 0,
         "bottom_padding_mobile": 0
       }
+    },
+    "pagefly_section_UFxJb3": {
+      "type": "pagefly-section",
+      "settings": {
+        "section_id": "pf-9889958c"
+      }
     }
   },
   "order": [
@@ -266,6 +272,7 @@
     "collage",
     "video",
     "multicolumn",
-    "otsb_image_comparison_1_yhpD4m"
+    "otsb_image_comparison_1_yhpD4m",
+    "pagefly_section_UFxJb3"
   ]
 }
