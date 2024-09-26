@@ -1,0 +1,234 @@
+{% liquid
+  assign mouseIcon = section.settings.mouse_icon
+  assign mouseIconHover = section.settings.mouse_icon_hover
+  assign mouseIconSize = section.settings.mouse_icon_size
+  assign imageSize = mouseIconSize | append: 'x' | append: mouseIconSize
+  assign mouseIconUrl = mouseIcon | img_url: imageSize
+  assign mouseIconUrlHover = mouseIconHover | img_url: imageSize
+  assign right_click_disabled = section.settings.disable_right_click
+%}
+
+{% for block in section.blocks %}
+  {% if block.type == 'mouse_effect' %}
+    {% capture otsb_cursor_effect_dt %}
+      {
+      'type':'{{ block.settings.type }}',
+      'section_id':'{{ section.id }}',
+      'image':{% if mouseIcon != blank %}'{{ mouseIconUrl }}'{% else %}null{% endif %},
+      'text': '{{ block.settings.text }}'
+      }
+    {% endcapture %}
+  {% endif %}
+{% endfor %}
+
+{% capture otsb_image_cursor %}
+  {
+  'section_id': '{{ section.id }}',
+  'mouse_url': {% if mouseIcon != blank %}'{{ mouseIconUrl }}'{% else %}null{% endif %},
+  'mouse_selector': 'body',
+  'mouse_hover_url': {% if mouseIconHover != blank %}'{{ mouseIconUrlHover }}'{%else%}null{% endif %},
+  'mouse_hover_selector': 'body button:hover, body a[href]:hover, body .link',
+  {% if otsb_cursor_effect_dt != blank %}
+    'mouse_effect': {{ otsb_cursor_effect_dt }}
+  {% endif %}
+  }
+{% endcapture %}
+<div 
+  {% if mouseIcon != blank %}data-mouse-hover-url="{{ mouseIconUrlHover }}"{% endif %}
+  {% if mouseIconHover != blank %}data-mouse-url="{{ mouseIconUrl }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="overflow:hidden;display: block;width:-webkit-fill-available;height:-webkit-fill-available;position:fixed;top:0;left:0;pointer-events:none;width:0;height:0;visibility:hidden;opacity:0"
+  id="otsb-custom-cursor-{{ section.id }}"
+  x-data="otsb_custom_cursor({{ otsb_image_cursor | escape }})"
+>
+</div>
+
+<script>
+  {% if right_click_disabled %}
+  document.addEventListener('contextmenu', event => event.preventDefault());
+  {% endif %}
+</script>
+
+<script src="{{ 'otsb-cursor.js' | asset_url }}" defer></script>
+{% schema %}
+{
+  "name": "OT: Custom Cursor",
+  "tag": "section",
+  "limit": 1,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Please enable app embeds in theme editor to use mouse effects."
+    },
+    {
+      "type": "image_picker",
+      "id": "mouse_icon",
+      "label": "Mouse Icon"
+    },
+    {
+      "type": "image_picker",
+      "id": "mouse_icon_hover",
+      "label": "Mouse Icon Hover"
+    },
+    {
+      "type": "select",
+      "id": "mouse_icon_size",
+      "options": [
+        {
+          "value": "16",
+          "label": "Small"
+        },
+        {
+          "value": "32",
+          "label": "Medium"
+        },
+        {
+          "value": "64",
+          "label": "Large"
+        }  
+      ],
+      "default": "32",
+      "label": "Icon Size"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_right_click",
+      "default": false,
+      "label": "Disable Mouse Right Click"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "mouse_effect",
+      "name": "Cursor Effect",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select",
+          "id": "type",
+          "default": "fairyDustCursor",
+          "label": "Effect Type",
+          "options": [
+            {
+              "value": "fairyDustCursor",
+              "label": "Fairy Dust"
+            },
+            {
+              "value": "ghostCursor",
+              "label": "Ghost"
+            },
+            {
+              "value": "emojiCursor_fun",
+              "label": "Emoji Fun"
+            },
+            {
+              "value": "emojiCursor_fruits",
+              "label": "Emoji Fruits"
+            },
+            {
+            "value": "emojiCursor_house_animals",
+            "label": "Emoji House Animals"
+            },
+            {
+              "value": "emojiCursor_wild_animals",
+              "label": "Emoji Wild Animals"
+            },
+            {
+              "value": "emojiCursor_bats",
+              "label": "Emoji Bats"
+            },
+            {
+              "value": "emojiCursor_unicorn",
+              "label": "Emoji Unicorn"
+            },
+            {
+              "value": "emojiCursor_halloween",
+              "label": "Emoji Halloween"
+            },
+            {
+              "value": "emojiCursor_christmas",
+              "label": "Emoji Christmas"
+            },
+            {
+              "value": "emojiCursor_fish",
+              "label": "Emoji Fish"
+            },
+            {
+              "value": "followingDotCursor_white",
+              "label": "Following Dot White"
+            },
+            {
+              "value": "bubbleCursor",
+              "label": "Bubble"
+            },
+            {
+              "value": "springyEmojiCursor_star",
+              "label": "Spring Emoji Star"
+            },
+            {
+              "value": "springyEmojiCursor_heart",
+              "label": "Spring Emoji Heart"
+            },
+            {
+              "value": "snowflakeCursor",
+              "label": "Snowflake"
+            },
+            {
+              "value": "trailingCursor",
+              "label": "Trailing"
+            },
+            {
+              "value": "rainbowCursor",
+              "label": "Rainbow"
+            },
+            {
+              "value": "flagCursor_ukraine",
+              "label": "Flag Ukraine"
+            },
+            {
+              "value": "flagCursor_poland",
+              "label": "Flag Poland"
+            },
+            {
+              "value": "flagCursor_germany",
+              "label": "Flag Germany"
+            },
+            {
+              "value": "flagCursor_france",
+              "label": "Flag France"
+            },
+            {
+              "value": "flagCursor_spain",
+              "label": "Flag Spain"
+            },
+            {
+              "value": "flagCursor_italy",
+              "label": "Flag Italy"
+            },
+            {
+              "value": "flagCursor_usa",
+              "label": "Flag USA"
+            },
+            {
+              "value": "textFlag",
+              "label": "Text Flag"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "info": "Only for Text Flag effect"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "OT: Custom Cursor",
+      "settings": {}
+    }
+  ]
+}
+{% endschema %}
