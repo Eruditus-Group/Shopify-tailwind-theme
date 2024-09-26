@@ -1,0 +1,181 @@
+
+{% liquid
+  assign screen_md = 768
+  assign heading_size = section.settings.heading_size | times: 0.01
+%}
+{% style %}
+  section#shopify-section-{{ section.id }}.otsb__root .otsb-images-collection__container {
+    padding-top: {{ section.settings.mobile_padding_top }}px;
+    padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+    @media (min-width: {{ screen_md }}px) {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  section#shopify-section-{{ section.id }}.otsb__root {
+    --colors-heading: {% if section.settings.heading_color.alpha != 0 %} {{ section.settings.heading_color.red }}, {{ section.settings.heading_color.green }}, {{ section.settings.heading_color.blue }} {% else %}var(--color-foreground){% endif %}, 1;
+    --colors-line-and-border: {% if section.settings.line_n_borders_color != 0 %} {{ section.settings.line_n_borders_color.red }}, {{ section.settings.line_n_borders_color.green }}, {{ section.settings.line_n_borders_color.blue }} {% else %}242, 242, 242{% endif %};
+  }
+  section#shopify-section-{{ section.id }}.otsb__root .heading {
+    --otsb-font-heading-scale: {{ heading_size }};
+    font-size: calc(var(--otsb-font-heading-scale) * 2.4rem);
+    text-align: {{ section.settings.heading_alignment }};
+  }
+  section#shopify-section-{{ section.id }}.otsb__root .otsb-images-collection__collection {
+    display: grid;
+    grid-gap: {{ section.settings.mobile_spacing }}px;
+    grid-template-columns: repeat({{ section.settings.mobile_max_columns }}, minmax(0, 1fr));
+    @media (min-width: {{ screen_md }}px) {
+      grid-template-columns: repeat({{ section.settings.max_columns }}, minmax(0, 1fr));
+      grid-gap: {{ section.settings.spacing }}px;
+    }
+  }
+  .otsb__root .otsb-images-collection__collection .collection__item {
+    position: relative;
+    min-height: {{ section.settings.mobile_height }}px;
+    grid-column: var(--otsb-grid-column);
+    grid-row: var(--otsb-grid-row);
+    @media (min-width: {{ screen_md }}px) {
+      min-height: {{ section.settings.height_desktop }}px;
+    }
+  }
+  .otsb__root .otsb-images-collection__collection .collection__item .otsb-image-treatment-overlay {
+    opacity: var(--otsb-overlay-opacity, 0);
+    display: block;
+  }
+  section#shopify-section-{{ section.id }}.otsb__root .otsb-images-collection__container .otsb_ic_title {
+    text-align: left;
+    margin: 0 {{ section.settings.mobile_title_margin_right }}px {{ section.settings.mobile_title_margin_bottom }}px {{ section.settings.mobile_title_margin_left }}px;
+    font-size: calc(var(--otsb-ic-title-scale) * 1.75rem);
+    @media (min-width: {{ screen_md }}px) {
+      font-size: calc(var(--otsb-ic-title-scale) * 2rem);
+      margin: 0 {{ section.settings.title_margin_right }}px {{ section.settings.title_margin_bottom }}px {{ section.settings.title_margin_left }}px;
+    }
+  }
+  {% if section.settings.disable_zoom == true %}
+  section#shopify-section-{{ section.id }}.otsb__root .otsb-image-hover {
+    --otsb-image-zoom: 1;
+  }
+  {% endif %}
+{% endstyle %}
+
+{% liquid
+  assign otsb_ic_container_classes = ''
+  unless section.settings.mobile_full_width and section.settings.full_width
+    assign otsb_ic_container_classes = 'otsb-page-width-v2'
+  endunless
+  if section.settings.full_width
+    assign otsb_ic_container_classes = otsb_ic_container_classes | append: ' otsb-full-width-desk-v2 md:px-6'
+  endif
+  if section.settings.mobile_full_width
+    assign otsb_ic_container_classes = otsb_ic_container_classes | append: ' otsb-full-width-v2'
+  endif
+%}
+<style>
+  .otsb_nope {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    opacity: 0 !important;
+  }
+</style>
+{% if request.design_mode %}
+  <style>
+    ._otsb_warning {
+      position: relative;
+      box-shadow: 0rem 0.1875rem 0.0625rem -0.0625rem rgba(26, 26, 26, 0.07);
+      border-radius: 1rem;
+    }
+    ._otsb_warning::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      box-shadow: 0.0625rem 0rem 0rem 0rem rgba(0, 0, 0, 0.13) inset, -0.0625rem 0rem 0rem 0rem rgba(0, 0, 0, 0.13) inset, 0rem -0.0625rem 0rem 0rem rgba(0, 0, 0, 0.17) inset, 0rem 0.0625rem 0rem 0rem rgba(204, 204, 204, 0.5) inset;
+      border-radius: 1rem;
+      pointer-events: none;
+      mix-blend-mode: luminosity;
+    }
+  </style>
+  <div x-data="otsb_script_require" class="page-width" style="margin-top:36px;margin-bottom:36px">
+    <div class="_otsb_warning">
+      <div style="border-top-left-radius:1rem;border-top-right-radius:1rem;border:1px solid #fcaf0a;background:#fcb827;padding:1rem">
+        <div style="align-items:center;gap:8px;display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:space-between">
+          <div style="display:flex;gap:4px;flex-direction:row;flex-wrap:nowrap;justify-content:space-between">
+            <span style="display:block;height:20px;width:20px;max-height:100%;max-width:100%;margin:auto">
+              <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M10 6.75a.75.75 0 0 1 .75.75v3.5a.75.75 0 1 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Z"></path><path d="M11 13.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path><path fill-rule="evenodd" d="M10 3.5c-1.045 0-1.784.702-2.152 1.447a449.26 449.26 0 0 1-2.005 3.847l-.028.052a403.426 403.426 0 0 0-2.008 3.856c-.372.752-.478 1.75.093 2.614.57.863 1.542 1.184 2.464 1.184h7.272c.922 0 1.895-.32 2.464-1.184.57-.864.465-1.862.093-2.614-.21-.424-1.113-2.147-2.004-3.847l-.032-.061a429.497 429.497 0 0 1-2.005-3.847c-.368-.745-1.107-1.447-2.152-1.447Zm-.808 2.112c.404-.816 1.212-.816 1.616 0 .202.409 1.112 2.145 2.022 3.88a418.904 418.904 0 0 1 2.018 3.875c.404.817 0 1.633-1.212 1.633h-7.272c-1.212 0-1.617-.816-1.212-1.633.202-.408 1.113-2.147 2.023-3.883a421.932 421.932 0 0 0 2.017-3.872Z"></path></svg>
+            </span>
+            <h2 style="overflow-wrap:anywhere;word-break:normal;font-size:100%;font-weight:650;line-height:1.25;color:rgb(37,26,0)">App Embeds Are Disabled</h2>
+          </div>
+        </div>
+      </div>
+      <div style="padding:1rem;color:rgb(37,26,0)">
+        <p>To use this section, the app embeds of OT: Theme Sections must be enabled in the theme editor. Please follow these steps to activate them:</p>
+        <ul>
+          <li>In the left panel, click the last icon that says <b>“App embeds”</b>.</li>
+          <li>Enter <b>“OT”</b> on the search bar to quickly find and embed the apps from OT: Theme Sections.</li>
+          <li>Turn on the Toggle buttons of "Section Builder Script" and "Section Builder Style", then click <b>Save</b>.</li>
+        </ul>
+        <p>Please refer to the User Guide <a href="https://support.omnithemes.com/blogs/ot-theme-sections-get-started/1-embed-app-to-shopify-theme" target="_blank">here</a></p>
+        <p>For further support: feel free to contact us at <a href="mailto:support@omnithemes.com">support@omnithemes.com</a>!</p>
+      </div>
+    </div>
+  </div>
+{% endif %}
+<div class="otsb_nope" x-data="otsb_script_1">
+{% render 'otsb-section-divider' %}
+<div class="otsb-images-collection__container {{ otsb_ic_container_classes }}">
+  {% if section.settings.heading != blank %}
+    <{{ section.settings.heading_tag }} class="heading mb-12 mt-0 otsb-p-break-words {% if section.settings.mobile_full_width %}px-6 md:px-0{% endif %}">
+      {{ section.settings.heading | escape }}
+    </{{ section.settings.heading_tag }}>
+  {% endif %}
+  <div class="otsb-images-collection__collection">
+    {% for block in section.blocks %}
+      {% style %}
+        section#shopify-section-{{ section.id }}.otsb__root .otsb-images-collection__collection .collection__item.item__{{ block.id }} {
+          {% liquid
+            assign mobile_grid_column = block.settings.number_of_columns | plus: 0
+            assign config_mobile_max_colums = section.settings.mobile_max_columns | plus: 0
+            if config_mobile_max_colums < mobile_grid_column
+              assign mobile_grid_column = config_mobile_max_colums
+            endif
+          %}
+          --otsb-grid-column: span {{ mobile_grid_column }} / span {{ mobile_grid_column }};
+          --otsb-grid-row: span {{ block.settings.number_of_row }} / span {{ block.settings.number_of_row }};
+          --otsb-overlay-opacity: {{ block.settings.overlay_opacity | divided_by: 100.0 }};
+          --image-treatment-overlay: {% if block.settings.overlay_color.alpha != 0 %}{{block.settings.overlay_color.red}},{{block.settings.overlay_color.green}},{{block.settings.overlay_color.blue}},1{% else %}transparent{% endif %};
+          {% if section.settings.text_color.alpha != 0 %}
+          --otsb-images-collection-title: {{ section.settings.text_color }};
+          {% endif %}
+          --otsb-ic-title-scale: {{ block.settings.text_size | times: 0.01 }};
+          @media (min-width: {{ screen_md }}px) {
+            --otsb-grid-column: span {{ block.settings.number_of_columns }} / span {{ block.settings.number_of_columns }};
+            --otsb-grid-row: span {{ block.settings.number_of_row }} / span {{ block.settings.number_of_row }};
+          }
+        }
+      {% endstyle %}
+      <div class="collection__item item__{{ block.id }} overflow-clip {% if section.settings.edges_type == 'rounded_corners' %}rounded-lg{% endif %}" {{ block.shopify_attributes }}>
+        {% if block.settings.collection != blank %}
+          <a href="{{ block.settings.collection.url }}" class="h-full flex items-end">
+            <{{ block.settings.heading_tag }} class="otsb_ic_title block w-full font-bold relative z-[1] text-[--otsb-images-collection-title] leading-none">{{ block.settings.collection.title }}</{{ block.settings.heading_tag }}>
+            {% if block.settings.collection.image != blank %}
+              {{ block.settings.collection.image | image_url: width: 3840 | image_tag: loading: 'lazy', sizes: sizes, widths: '375, 450, 750, 900, 1100, 1500, 1780, 2000, 3000, 3840', class: 'w-full object-cover z-0 h-full otsb-image-hover absolute top-0 left-0 block' }}
+            {% else %}
+              {{ 'collection-4' | placeholder_svg_tag: 'bg-[#c9c9c9] text-[#acacac] absolute top-0 left-0 w-full h-full object-cover z-0' }}
+            {% endif %}
+          </a>
+        {% else %}
+          {{ 'collection-4' | placeholder_svg_tag: 'bg-[#c9c9c9] text-[#acacac] absolute top-0 left-0 w-full h-full object-cover z-0' }}
+        {% endif %}
+        <div class="absolute top-0 left-0 bottom-0 right-0 otsb-image-treatment-overlay pointer-events-none"></div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
