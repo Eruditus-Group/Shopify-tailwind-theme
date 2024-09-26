@@ -1,0 +1,795 @@
+{%- liquid
+  if settings.text_base_size != blank
+    assign pagination_size = section.settings.pagination_size | times: settings.text_base_size | times: 0.0000875
+  else
+    assign pagination_size = section.settings.pagination_size | times: 120 | times: 0.0000875
+  endif
+  assign enable_slider = false
+  if section.blocks.size > 1
+    assign enable_slider = true
+  endif
+  assign block_first = section.blocks | first
+  if block_first.settings.video_url.type == 'youtube' or  block_first.settings.video_url.type == 'vimeo' or block_first.settings.video != null
+    assign adapt_video = true
+  else
+    if block_first.settings.image != blank
+      assign image_adapt = block_first.settings.image
+    elsif block_first.settings.collection.image != blank
+      assign image_adapt = block_first.settings.collection.image
+    endif
+  endif
+
+  if section.blocks.size > 2
+    assign swiper_on_mobile = true
+  else
+    assign swiper_on_mobile = false
+  endif
+  if section.blocks.size > 3
+    assign swiper_on_tablet = true
+  else
+    assign swiper_on_tablet = false
+  endif
+  if settings.page_width < 1200 and section.blocks.size >= 5
+    assign swiper_on_desktop = true
+  elsif settings.page_width < 1300 and settings.page_width >= 1200 and section.blocks.size >= 6
+    assign swiper_on_desktop = true
+  else
+    assign swiper_on_desktop = false
+  endif
+-%}
+
+{%- style -%}
+  #shopify-section-{{ section.id }} .otsb__root .otsb-image-treatment-overlay {
+    --image-treatment-overlay: {{ section.settings.image_overlay_color.red }}, {{ section.settings.image_overlay_color.green }}, {{ section.settings.image_overlay_color.blue }};
+  }
+  #shopify-section-{{ section.id }} .otsb__root .splide__arrows .splide__arrow {
+    color: var(--color-foreground);
+  }
+  {% if section.settings.collection_title_color.alpha != 0 %}
+    #shopify-section-{{ section.id }} .otsb__root .otsb-pagination-link {
+      --colors-heading: {{ section.settings.collection_title_color.red }}, {{ section.settings.collection_title_color.green }}, {{ section.settings.collection_title_color.blue }};
+    }
+    #shopify-section-{{ section.id }} .otsb__root .splide__arrows .splide__arrow {
+      --color-foreground: rgb({{ section.settings.collection_title_color.red }}, {{ section.settings.collection_title_color.green }}, {{ section.settings.collection_title_color.blue }});
+    }
+  {% endif %}
+
+  .otsb__root .mobile-{{ section.id }}-natural {
+    {%- if adapt_video != true and block_first and block_first.settings.image_mobile != blank -%}
+      height:0;
+      padding-bottom: {{ 1 | divided_by: block_first.settings.image_mobile.aspect_ratio | times: 100 }}%;
+    {%- else -%}
+      height: 550px;
+    {%- endif -%}
+  }
+  .otsb__root #x-hotspot-{{ section.id }} .otsb-pagination-link {
+    font-size: {{ pagination_size | times: 0.6 }}rem;
+  }
+
+  @media screen and (min-width: 768px){
+    .otsb__root .desktop-{{ section.id }}-natural {
+      {%- if image_adapt -%}
+        height:0;
+        padding-bottom: {{ 1 | divided_by: image_adapt.aspect_ratio | times: 100 }}%;
+      {%- else -%}
+        height: 650px;
+      {%- endif -%}
+    }
+    .otsb__root #x-hotspot-{{ section.id }} .otsb-pagination-link {
+      font-size: {{ pagination_size }}rem;
+    }
+  }
+{%- endstyle -%}
+<style>
+  .otsb_nope {
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    opacity: 0 !important;
+  }
+</style>
+{% if request.design_mode %}
+  <style>
+    ._otsb_warning {
+      position: relative;
+      box-shadow: 0rem 0.1875rem 0.0625rem -0.0625rem rgba(26, 26, 26, 0.07);
+      border-radius: 1rem;
+    }
+    ._otsb_warning::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      box-shadow: 0.0625rem 0rem 0rem 0rem rgba(0, 0, 0, 0.13) inset, -0.0625rem 0rem 0rem 0rem rgba(0, 0, 0, 0.13) inset, 0rem -0.0625rem 0rem 0rem rgba(0, 0, 0, 0.17) inset, 0rem 0.0625rem 0rem 0rem rgba(204, 204, 204, 0.5) inset;
+      border-radius: 1rem;
+      pointer-events: none;
+      mix-blend-mode: luminosity;
+    }
+  </style>
+  <div x-data="otsb_script_require" class="page-width" style="margin-top:36px;margin-bottom:36px">
+    <div class="_otsb_warning">
+      <div style="border-top-left-radius:1rem;border-top-right-radius:1rem;border:1px solid #fcaf0a;background:#fcb827;padding:1rem">
+        <div style="align-items:center;gap:8px;display:flex;flex-direction:row;flex-wrap:nowrap;justify-content:space-between">
+          <div style="display:flex;gap:4px;flex-direction:row;flex-wrap:nowrap;justify-content:space-between">
+            <span style="display:block;height:20px;width:20px;max-height:100%;max-width:100%;margin:auto">
+              <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M10 6.75a.75.75 0 0 1 .75.75v3.5a.75.75 0 1 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Z"></path><path d="M11 13.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path><path fill-rule="evenodd" d="M10 3.5c-1.045 0-1.784.702-2.152 1.447a449.26 449.26 0 0 1-2.005 3.847l-.028.052a403.426 403.426 0 0 0-2.008 3.856c-.372.752-.478 1.75.093 2.614.57.863 1.542 1.184 2.464 1.184h7.272c.922 0 1.895-.32 2.464-1.184.57-.864.465-1.862.093-2.614-.21-.424-1.113-2.147-2.004-3.847l-.032-.061a429.497 429.497 0 0 1-2.005-3.847c-.368-.745-1.107-1.447-2.152-1.447Zm-.808 2.112c.404-.816 1.212-.816 1.616 0 .202.409 1.112 2.145 2.022 3.88a418.904 418.904 0 0 1 2.018 3.875c.404.817 0 1.633-1.212 1.633h-7.272c-1.212 0-1.617-.816-1.212-1.633.202-.408 1.113-2.147 2.023-3.883a421.932 421.932 0 0 0 2.017-3.872Z"></path></svg>
+            </span>
+            <h2 style="overflow-wrap:anywhere;word-break:normal;font-size:100%;font-weight:650;line-height:1.25;color:rgb(37,26,0)">App Embeds Are Disabled</h2>
+          </div>
+        </div>
+      </div>
+      <div style="padding:1rem;color:rgb(37,26,0)">
+        <p>To use this section, the app embeds of OT: Theme Sections must be enabled in the theme editor. Please follow these steps to activate them:</p>
+        <ul>
+          <li>In the left panel, click the last icon that says <b>“App embeds”</b>.</li>
+          <li>Enter <b>“OT”</b> on the search bar to quickly find and embed the apps from OT: Theme Sections.</li>
+          <li>Turn on the Toggle buttons of "Section Builder Script" and "Section Builder Style", then click <b>Save</b>.</li>
+        </ul>
+        <p>Please refer to the User Guide <a href="https://support.omnithemes.com/blogs/ot-theme-sections-get-started/1-embed-app-to-shopify-theme" target="_blank">here</a></p>
+        <p>For further support: feel free to contact us at <a href="mailto:support@omnithemes.com">support@omnithemes.com</a>!</p>
+      </div>
+    </div>
+  </div>
+{% endif %}
+<div class="otsb__root otsb-v2 otsb_nope" x-data="otsb_script_1">
+<div class="pt-[{{ section.settings.padding_top_mobile }}px] md:pt-[{{ section.settings.padding_top }}px] pb-[{{ section.settings.padding_bottom_mobile }}px] md:pb-[{{ section.settings.padding_bottom }}px]">
+  <div class="mx-auto{% if section.settings.full_width %}{% if section.settings.padding_full_width %} md:pl-5 md:pr-5{% else %} md:pl-0 md:pr-0{% endif %}{% else %} otsb-page-width{% endif %}{% if section.settings.full_width_mobile %} otsb-full-width-mobile{% else %} pl-5 pr-5{% endif %}">
+    <div class="promotion section--{{ section.id }} w-full flex relative overflow-hidden{% if section.settings.desktop_height == "natural" %}{% if adapt_video %} md:pb-[56.25%]{% else %}{% if image_adapt != blank %} md:h-0 desktop-{{ section.id }}-natural{% else %} md:promotion:pb-0 md:promotion:h-[650px]{% endif %}{% endif %}{% else %} md:promotion:h-[{{ section.settings.desktop_height }}] md:promotion:pb-0{% endif %}
+      {% if section.settings.mobile_height == "natural" %}{% if adapt_video %} pb-[56.25%]{% else %}{% if block_first.settings.image_mobile != blank %} h-0 mobile-{{ section.id }}-natural{% else %} h-[550px]{% endif %}{% endif %}{% else %}h-[{{ section.settings.mobile_height }}] md:h-auto{% endif %}">
+      <div
+        x-data
+        id="x-collection-list-banner-{{ section.id }}"
+        class="{% if settings.lang_direction contains request.locale.iso_code and section.settings.transition_style == "fade" %}otsb-ltr {% endif %}splide-slideshow h-full w-full visible{% if enable_slider %} x-splide splide cursor-grab group{% endif %}{% if section.settings.mobile_height == 'natural' %} absolute top-0 left-0 bottom-0{% else %} relative{% endif %}
+        {% if section.settings.desktop_height == "natural" %} md:absolute md:top-0 md:left-0 md:bottom-0{% else %} md:promotion:relative{% endif %}"
+        {% if enable_slider %}
+          x-intersect.once.margin.200px='$store.otsb_xSplide.load($el, {
+            "speed": 1000,
+            "pauseOnFocus": false,
+            "hotspot": "x-hotspot-{{ section.id }}",
+            "disableHoverOnTouch": true,
+            {%- if settings.lang_direction contains request.locale.iso_code %}
+              "direction": "rtl",
+            {%- endif %}
+            {%- if section.settings.transition_style == "fade" %}
+              "rewind": true,
+              "type": "fade",
+            {%- else %}
+              "type": "loop",
+            {%- endif %}
+            {%- if section.settings.auto_play -%}
+              "autoplay": true,
+              "interval": {{ section.settings.change_slides_speed | times: 1000 }},
+              "pauseOnHover": true,
+            {%- endif %}
+            "classes": {
+              "arrows": "splide__arrows hidden",
+              "pagination": "hidden"
+            }
+          })'
+        {%- endif -%}
+        >
+        <div class="relative bg-[#c9c9c9] h-full w-full{% if enable_slider %} splide__track{% endif %} overflow-hidden{% if section.settings.rounded_corner_image %} md:rounded-[10px]{% else %} md:rounded-none{% endif %}{% if section.settings.rounded_corner_image_mobile %} rounded-[10px]{% endif %}">
+          <div class="w-full h-full{% if enable_slider %} splide__list flex{% endif %}">
+            {%- for block in section.blocks -%}
+              {%- liquid
+                if settings.heading_base_size != blank
+                  assign heading_size = block.settings.heading_size | times: settings.heading_base_size | times: 0.000225
+                else
+                  assign heading_size = block.settings.heading_size | times: 100 | times: 0.000225
+                endif
+                assign imageDesktop = blank
+                if block.settings.image != blank
+                  assign imageDesktop = block.settings.image
+                elsif block.settings.collection.image != blank
+                  assign imageDesktop = block.settings.collection.image
+                endif
+                if block.settings.image_mobile != blank
+                  assign imageUrlMobile = block.settings.image_mobile
+                else
+                  assign imageUrlMobile = imageDesktop
+                endif
+
+                assign video_type = false
+                assign video_alt = block.settings.video_alt_text
+                if block.settings.video_url.type == 'youtube'
+                  assign video_type = 'youtube'
+                  assign video_id = block.settings.video_url.id
+                endif
+                if block.settings.video_url.type == 'vimeo'
+                  assign video_type = 'vimeo'
+                  assign video_id = block.settings.video_url.id
+                endif
+
+                if block.settings.video != null
+                  assign video_type = 'video_select'
+                endif
+
+                case block.settings.button_type
+                  when 'rounded'
+                    assign borderRadius = '100px'
+                  when 'rounded_corners'
+                    assign borderRadius = '6px'
+                  when 'mixed'
+                    assign borderRadius = '6px 0 6px 0'
+                  else
+                    assign borderRadius = '0'
+                endcase
+              -%}
+              {%- style -%}
+              #shopify-section-{{ section.id }} .x-collection-banner-{{ block.id }} {
+                {% unless block.settings.color_text.alpha == 0.0 %}
+                  --image-treatment-text: {{ block.settings.color_text.red }}, {{ block.settings.color_text.green }}, {{ block.settings.color_text.blue }};
+                  {% else %}
+                  --image-treatment-text: var(--color-foreground);
+                {% endunless %}
+              }
+
+                .otsb__root p.sub-heading-{{ block.id }} {
+                  color: rgba(var(--colors-heading));
+                }
+                #shopify-section-{{ section.id }} .otsb__root .x-collection-banner-{{ block.id }} {
+                  {% if block.settings.color_text.alpha != 0 %}
+                    --colors-heading: {{ block.settings.color_text.red }}, {{ block.settings.color_text.green }}, {{ block.settings.color_text.blue }}, 1;
+                  {% else %}
+                    --colors-heading: var(--color-foreground),1;
+                  {% endif %}
+                }
+                #shopify-section-{{ section.id }} .x-collection-banner-{{ block.id }} {
+                  {% if block.settings.color_text_link.alpha != 0.0 %}
+                  --colors-text-link: {{ block.settings.color_text_link.red }}, {{ block.settings.color_text_link.green }}, {{ block.settings.color_text_link.blue }};
+                  {% else %}
+                  --colors-text-link: var(--color-link);
+                  {% endif %}
+                }
+
+                .button--{{ block.id }}.otsb-button-solid,
+                .button--{{ block.id }}.otsb-button-solid:before {
+                  --border-radius: {{ borderRadius }};
+                  {% if block.settings.button_animation == 'slide' %}
+                    --button-width: 102%;
+                    --button-height: 500%;
+                    --button-transform: rotate3d(0,0,1,-10deg) translate3d(-130%,-10em,0);
+                    --button-transform-origin: 100% 0%;
+                  {% elsif block.settings.button_animation == 'fill_up' %}
+                    --button-width: 120%;
+                    --button-height: 100%;
+                    --button-transform: rotate3d(0,0,1,10deg) translate3d(-1.2em,110%,0);
+                    --button-transform-origin: 0% 100%;
+                  {% endif %}
+                  {%- unless block.settings.color_button.alpha == 0.0 -%}
+                    --colors-line-and-border: {{ block.settings.color_button.red }}, {{ block.settings.color_button.green }}, {{ block.settings.color_button.blue }};
+                    --colors-button: {{ block.settings.color_button.red }}, {{ block.settings.color_button.green }}, {{ block.settings.color_button.blue }};
+                  {%- else -%}
+                    --colors-line-and-border: var(--colors-button, 0, 0, 0);
+                  {%- endunless -%}
+                  {%- unless block.settings.color_button_hover.alpha == 0.0 -%}
+                    --colors-button-hover: rgb({{ block.settings.color_button_hover.red }}, {{ block.settings.color_button_hover.green }}, {{ block.settings.color_button_hover.blue }});
+                  {%- endunless -%}
+                  {%- unless block.settings.color_text_button.alpha == 0.0 -%}
+                    --colors-button-text: {{ block.settings.color_text_button.red }}, {{ block.settings.color_text_button.green }}, {{ block.settings.color_text_button.blue }};
+                  {%- endunless -%}
+                  {%- unless block.settings.color_text_button_hover.alpha == 0.0 -%}
+                    --colors-button-text-hover: {{ block.settings.color_text_button_hover.red }}, {{ block.settings.color_text_button_hover.green }}, {{ block.settings.color_text_button_hover.blue }};
+                  {%- endunless -%}
+                }
+                .otsb__root .button--{{ block.id }}.otsb-button-outline {
+                  --border-radius: {{ borderRadius }};
+                  {%- if block.settings.secondary_button_text.alpha != 0.0 -%}
+                    --colors-secondary-button: {{ block.settings.secondary_button_text.red }}, {{ block.settings.secondary_button_text.green }}, {{ block.settings.secondary_button_text.blue }};
+                    --colors-line-secondary-button: {{ block.settings.secondary_button_text.red }}, {{ block.settings.secondary_button_text.green }}, {{ block.settings.secondary_button_text.blue }};
+                    --background-secondary-button: transparent;
+                  {% endif %}
+                  {%- if block.settings.color_button_secondary.alpha != 0.0 -%}
+                    --background-secondary-button: {{ block.settings.color_button_secondary.red }}, {{ block.settings.color_button_secondary.green }}, {{ block.settings.color_button_secondary.blue }};
+                    --colors-line-secondary-button: {{ block.settings.color_button_secondary.red }}, {{ block.settings.color_button_secondary.green }}, {{ block.settings.color_button_secondary.blue }};
+                  {% endif %}
+                }
+                {%- if block.settings.content_alignment == "custom" -%}
+                  .otsb__root .content--{{ block.id }}{
+                    left: {{ block.settings.custom_horizontal }}%;
+                    top: {{ block.settings.custom_vertical }}%;
+                    transform: translate(-{{ block.settings.custom_horizontal }}%,-{{ block.settings.custom_vertical }}%);
+                  }
+                {%- endif -%}
+                .otsb__root .heading--{{ block.id }} {
+                  font-size: {{ heading_size | times: 0.5 }}rem;
+                }
+                .otsb__root .sub-heading-{{ block.id }} {
+                  font-size: {{ heading_size | times: 0.3 }}rem;
+                }
+                .otsb__root .image-{{ block.id }} {
+                  object-position:{{ imageUrlMobile.presentation.focal_point }};
+                }
+                @media screen and (min-width: 768px) {
+                  .otsb__root .heading--{{ block.id }} {
+                    font-size: {{ heading_size }}rem;
+                  }
+                  .otsb__root .sub-heading-{{ block.id }} {
+                    font-size: {{ heading_size | times: 0.58 }}rem;
+                  }
+                  .otsb__root .image-{{ block.id }} {
+                    object-position:{{ block.settings.image.presentation.focal_point }};
+                  }
+                }
+                {%- if block.settings.content_position == "custom" -%}
+                  .otsb__root .promotion-banner--{{ block.id }} {
+                    left:{{ block.settings.content_horizontal }}%;
+                    top:{{ block.settings.content_vertical }}%;
+                    transform: translate(-{{ block.settings.content_horizontal }}%,-{{ block.settings.content_vertical }}%);
+                  }
+                {%- endif -%}
+              {%- endstyle -%}
+              {%- if section.settings.show_hero and forloop.first -%}
+                <div class="otsb-hidden">
+                  {{ imageUrlMobile | image_url: width: 1500 | image_tag: widths: '375, 450, 750, 900, 1100, 1500', preload: true, loading: 'lazy' }}
+                  {{ imageDesktop | image_url: width: 3840 | image_tag: widths: '750, 900, 1100, 1500, 1780, 2000, 3000, 3840', preload: true, loading: 'lazy' }}
+                </div>
+              {%- endif -%}
+              <div x-slide-index="{{ forloop.index | minus: 1 }}"
+                x-data="{effect: false}"
+                class="x-collection-banner-{{ block.id }} otsb-contain-video h-full relative transition-opacity flex-shrink-0 w-full{% if enable_slider %} splide__slide x-splide-slide{% endif %}{% if section.settings.show_hero %} w-full{% endif %}"
+                {%- if section.settings.transition_style != "fade" or enable_slider == false %}
+                {%- if section.settings.full_width %} x-intersect:leave.margin.-40px="effect = false"{% else %} x-intersect:leave.margin.-20px.half.-20px.haft="effect = false"{% endif %}
+                  x-intersect.half="effect = true;{%- if video_type %} $store.xVideo.play($el){%- endif %}"
+                  {%- if video_type %}
+                    x-intersect:leave.margin.-100px="$store.xVideo.pause($el);"
+                  {%- endif %}
+                {%- endif %}
+                {{ block.shopify_attributes }}
+              >
+                {%- if section.settings.transition_style == "fade" and enable_slider -%}
+                  <div x-data x-intersect.half="effect = true" x-intersect:leave.margin.-20px="effect = false"
+                    {%- if video_type %}
+                      x-intersect:leave.margin.-100px="$store.xVideo.pause($el);"
+                      x-intersect="$store.xVideo.play($el)"
+                    {%- endif %}
+                    class="absolute top-0 left-0 w-full h-full otsb-hidden otsb-active-slide-fade{% if forloop.first %} otsb-active-slide-fade-first{% endif %}"
+                  >
+                  </div>
+                {%- endif -%}
+                <div class="h-full relative overflow-hidden">
+                  <span class="absolute pointer-events-none top-0 left-0 bottom-0 right-0 z-10 otsb-image-treatment-overlay opacity-{{ block.settings.overlay_opacity }}"></span>
+                  <div :class="effect && 'active'" class="h-full w-full absolute top-0 left-0 z-0 otsb-animate_transition_slide__image">
+                    {%- if video_type -%}
+                      <div class="absolute top-0 left-0 w-full h-full flex items-center">
+                        <div class="relative otsb-external-video h-full w-full rounded-none overflow-hidden otsb-video-hero">
+                          {%- if video_type == 'youtube' or video_type == 'vimeo' -%}
+                            <div
+                              x-data
+                              class="w-full h-full absolute"
+                              x-intersect="$store.xVideo.externalLoad($el, '{{ video_type }}', '{{ video_id }}', true, `{{ video_alt }}`, 0)"
+                            >
+                            </div>
+                          {%- endif -%}
+                          {% if video_type == 'video_select' %}
+                              {{ block.settings.video
+                              | video_tag:
+                                image_size: "1100x",
+                                loop: true,
+                                controls: false,
+                                muted: true,
+                                class: "w-full h-full absolute top-0 left-0 otsb-video object-cover",
+                                alt: video_alt
+                            }}
+                          {% endif %}
+                        </div>
+                      </div>
+                    {%- else -%}
+                      {%- if imageDesktop == blank -%}
+                        <div class="w-full h-full text-[#acacac]{% if block.settings.image_mobile != blank %} hidden{% endif %} md:block mx-auto">
+                          {{ 'lifestyle-2' | placeholder_svg_tag: 'w-full h-full' }}
+                        </div>
+                      {%- else -%}
+                        {%- liquid
+                          if block.settings.image != blank
+                            assign imageDesktop = block.settings.image
+                          else
+                            assign imageDesktop = block.settings.collection.image
+                          endif
+                        -%}
+                        {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+                        <parallax-image class="{% if block.settings.image_mobile != blank and request.design_mode %} otsb-hidden md:block{% endif %} h-full w-full">
+                          <parallax-movement x-data="xParallax" x-intersect.once.margin.200px="load({{ settings.disable_parallax_effect }})">
+                            <picture>
+                              <source
+                                srcset="{{ imageUrlMobile | image_url: width: 375 }} 375w,
+                                  {{ imageUrlMobile | image_url: width: 450 }} 450w,
+                                  {{ imageUrlMobile | image_url: width: 750 }} 750w,
+                                  {{ imageUrlMobile | image_url: width: 900 }} 900w,
+                                  {{ imageUrlMobile | image_url: width: 1100 }} 1100w,
+                                  {{ imageUrlMobile | image_url: width: 1500 }} 1500w"
+                                media="(max-width: 767px)"
+                                width="{{ imageUrlMobile.width }}"
+                                height="{{ imageUrlMobile.height }}"
+                              >
+                              <img
+                                srcset="{{ imageDesktop | image_url: width: 750 }} 750w,
+                                  {{ imageDesktop | image_url: width: 900 }} 900w,
+                                  {{ imageDesktop | image_url: width: 1100 }} 1100w,
+                                  {{ imageDesktop | image_url: width: 1500 }} 1500w,
+                                  {{ imageDesktop | image_url: width: 1780 }} 1780w,
+                                  {{ imageDesktop | image_url: width: 2000 }} 2000w,
+                                  {{ imageDesktop | image_url: width: 3000 }} 3000w,
+                                  {{ imageDesktop | image_url: width: 3840 }} 3840w"
+                                {% unless section.settings.show_hero and forloop.first %}
+                                  loading="lazy"
+                                {% else %}
+                                  loading="eager"
+                                  fetchpriority="high"
+                                  decoding="sync"
+                                {% endunless %}
+                                sizes="100vw"
+                                src="{{ imageDesktop | image_url: width: 3840 }}"
+                                {% if block.settings.image_mobile != blank %}
+                                  :alt="(screen.width < 768) ? '{{ block.settings.image_mobile.alt }}' : '{{ imageDesktop.alt }}'"
+                                {% else %}
+                                  alt="{{ imageDesktop.alt | escape }}"
+                                {% endif %}
+                                class="object-cover h-full w-full image-{{ block.id }}"
+                                width="{{ imageDesktop.width }}"
+                                height="{{ imageDesktop.height }}"
+                              >
+                            </picture>
+                          </parallax-movement>
+                        </parallax-image>
+                        {% comment %}theme-check-enable ImgLazyLoading{% endcomment %}
+                      {%- endif %}
+                      {%- if block.settings.image_mobile != blank and request.design_mode or imageDesktop == blank -%}
+                        {% comment %}theme-check-disable ImgLazyLoading{% endcomment %}
+                        <img
+                          srcset="{{ block.settings.image_mobile | image_url: width: 375 }} 375w,
+                          {{ block.settings.image_mobile | image_url: width: 450 }} 450w,
+                          {{ block.settings.image_mobile | image_url: width: 750 }} 750w,
+                          {{ block.settings.image_mobile | image_url: width: 900 }} 900w,
+                          {{ block.settings.image_mobile | image_url: width: 1100 }} 1100w,
+                          {{ block.settings.image_mobile | image_url: width: 1500 }} 1500w"
+                          sizes="100vw"
+                          src="{{ block.settings.image_mobile | image_url: width: 750 }}"
+                          alt="{{ block.settings.image_mobile.alt | escape }}"
+                          class="object-cover h-full w-full{% if block.settings.image_mobile != blank %} md:otsb-hidden{% endif %}"
+                          {% unless section.settings.show_hero and forloop.first %}
+                            loading="lazy"
+                          {% else %}
+                            loading="eager"
+                            fetchpriority="high"
+                            decoding="sync"
+                          {% endunless %}
+                          width="{{ block.settings.image_mobile.width }}"
+                          height="{{ block.settings.image_mobile.height }}"
+                          style="object-position: {{ block.settings.image_mobile.presentation.focal_point }}"
+                        >
+                        {% comment %}theme-check-enable ImgLazyLoading{% endcomment %}
+                      {%- endif %}
+                    {%- endif -%}
+                  </div>
+                </div>
+                <div class="{% if section.settings.content_position != "custom" %} otsb-page-width ml-5 mr-5 lg:mx-auto absolute top-0 left-0 bottom-0 right-0{% else %} w-full h-full{% endif %}">
+                  <div class="z-20 pointer-events-auto promotion-banner--{{ block.id }} absolute lg:max-w-3xl lg:w-3/5{% if block.settings.content_position != "custom" %} w-full promotion-alignment--{{ block.settings.content_position }}{% else %} min-w-[90%] md:min-w-[30rem]{% endif %}">
+                    <div :class="effect && 'active'" class="otsb-animate_transition_slide__box otsb-animate_slideshow__box lg:pl-5 lg:pr-5 mx-auto text-{{ block.settings.content_alignment }}">
+                      {%- if block.settings.subheading != blank -%}
+                        <p class="sub-heading-{{ block.id }} leading-tight italic otsb-p-break-words otsb-image-treatment-text">{{ block.settings.subheading | escape }}</p>
+                      {%- endif -%}
+                      {%- if block.settings.heading_item != blank -%}
+                        <{{ block.settings.heading_tag }} class="otsb-h2 block otsb-p-break-words heading--{{ block.id }} mt-1 leading-tight otsb-image-treatment-text">
+                          {{ block.settings.heading_item | escape }}
+                        </{{ block.settings.heading_tag }}>
+                      {%- endif -%}
+
+                      {%- if block.settings.collection.description != blank and block.settings.use_collection_description -%}
+                        <div class="lg:mt-1 otsb-p-break-words otsb-rte otsb-image-treatment-text otsb-text-medium otsb-rte">
+                          {{ block.settings.collection.description }}
+                        </div>
+                      {%- elsif block.settings.text_description != blank and block.settings.use_collection_description == false -%}
+                        <div class="lg:mt-1 otsb-p-break-words otsb-rte otsb-image-treatment-text otsb-text-medium otsb-rte">
+                          {{ block.settings.text_description }}
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.button_label_1 != blank -%}
+                        {%- liquid
+                          case block.settings.button_type
+                            when 'rounded'
+                              assign borderRadius = '100px'
+                            when 'rounded_corners'
+                              assign borderRadius = '6px'
+                            when 'mixed'
+                              assign borderRadius = '6px 0 6px 0'
+                            else
+                              assign borderRadius = '0'
+                          endcase
+                        %}
+
+                        {% style %}
+                        .button-{{ block.id }}, .button-{{ block.id }} *:before {
+                        --border-radius: {{ borderRadius }};
+                      {% if block.settings.button_animation == 'slide' %}
+                        --button-width: 102%;
+                        --button-height: 500%;
+                        --button-transform: rotate3d(0,0,1,-10deg) translate3d(-130%,-10em,0);
+                        --button-transform-origin: 100% 0%;
+                      {% elsif block.settings.button_animation == 'fill_up' %}
+                        --button-width: 120%;
+                        --button-height: 100%;
+                        --button-transform: rotate3d(0,0,1,10deg) translate3d(-1.2em,110%,0);
+                        --button-transform-origin: 0% 100%;
+                      {% endif %}
+                    }
+
+                    {% if block.settings.button_color_mobile == "hover" %}
+                      .otsb__root .x-button-{{ block.id }} [role="button"],
+                      .otsb__root .x-button-{{ block.id }} [type="button"],
+                      .otsb__root .x-button-{{ block.id }} .otsb-button {
+                        color: rgb(var(--colors-button-text-hover));
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-solid, .x-button-{{ block.id }} .otsb-button.otsb-button-solid {
+                        border: none;
+                        background-color: var(--colors-button-hover);
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-disable-effect, .x-button-{{ block.id }} .otsb-button.otsb-button-disable-effect {
+                        color: rgba(var(--colors-button-text-hover));
+                        background-color: var(--colors-button-hover);
+                      }
+                      .otsb__root .x-button-{{ block.id }} .otsb-button-action {
+                        border: none;
+                        color: rgba(var(--colors-button-text-hover));
+                        background-color: var(--colors-button-hover);
+                      }
+                    {% else %}
+                      .otsb__root .x-button-{{ block.id }} [role="button"],
+                      .otsb__root .x-button-{{ block.id }} [type="button"],
+                      .otsb__root .x-button-{{ block.id }} .otsb-button {
+                        color: rgb(var(--colors-button-text));
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-solid, .x-button-{{ block.id }} .otsb-button.otsb-button-solid {
+                        border: none;
+                        background-color: rgba(var(--colors-button));
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-disable-effect, .x-button-{{ block.id }} .otsb-button.otsb-button-disable-effect {
+                        color: rgb(var(--colors-button-text));
+                        background-color: rgba(var(--colors-button));
+                      }
+                      .otsb__root .x-button-{{ block.id }} .otsb-button-action {
+                        border: none;
+                        color: rgb(var(--colors-button-text));
+                        background-color: rgba(var(--colors-button));
+                      }
+                    {% endif %}
+                    .otsb__root .x-button-{{ block.id }} [role="button"],
+                    .otsb__root .x-button-{{ block.id }} [type="button"],
+                    .otsb__root .x-button-{{ block.id }} .otsb-button {
+                      direction: ltr;
+                    }
+
+                    {% if block.settings.button_animation == 'sliced' %}
+                      .x-button-{{ block.id }} .otsb-button.otsb-button-outline:not(.not-icon), .x-button-{{ block.id }} .otsb-button.otsb-button-solid:not(.not-icon) {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding-left: 1.5rem;
+                        padding-right: 1.5rem;
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid .otsb-button-icon, .x-button-{{ block.id }} .otsb-button-solid .otsb-button-text {
+                        transition-timing-function: cubic-bezier(0,.71,.4,1);
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid .otsb-button-icon {
+                        transition: opacity .25s,transform .5s;
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid .otsb-button-text {
+                        transition: transform .5s;
+                        transform: translateX(0.625rem);
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid:hover .otsb-button-text {
+                        opacity: 1;
+                        transform: translateX(0px);
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid:hover .otsb-button-icon {
+                        opacity: 1;
+                        transform: translateX(0.3125rem);
+                      }
+                    {% endif %}
+                    {% if block.settings.button_animation == 'underline' %}
+                      .x-button-{{ block.id }} .otsb-button-solid .otsb-button-text {
+                        position: relative;
+                        display: block;
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid .otsb-button-text::after {
+                        content: "";
+                        pointer-events: none;
+                        bottom: 1px;
+                        left: 50%;
+                        position: absolute;
+                        width: 0%;
+                        height: 1px;
+                        background-color: rgba(var(--colors-button-text));
+                        transition-timing-function: cubic-bezier(0.25, 0.8, 0.25, 1);
+                        transition-duration: 400ms;
+                        transition-property: width, left;
+                      }
+                      .x-button-{{ block.id }} .otsb-button-solid:hover .otsb-button-text::after {
+                        {% if block.settings.button_color_mobile == "hover" %}
+                          background-color: rgba(var(--colors-button-text-hover));
+                        {% else %}
+                          background-color: rgba(var(--colors-button-text));
+                        {% endif %}
+                          width: 100%;
+                          left: 0%;
+                      }
+                    {% endif %}
+
+                    @media (min-width: 1024px){
+                      .otsb__root .x-button-{{ block.id }} [role="button"],
+                      .otsb__root .x-button-{{ block.id }} [type="button"],
+                      .otsb__root .x-button-{{ block.id }} .otsb-button {
+                        color: rgba(var(--colors-button-text));
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-solid, .x-button-{{ block.id }} .otsb-button.otsb-button-solid {
+                        border: none;
+                        box-shadow: none;
+                        color: rgb(var(--colors-button-text));
+                        background-color: rgba(var(--colors-button));
+                        overflow: hidden;
+                        background-origin: border-box;
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-solid:hover, .x-button-{{ block.id }} .otsb-button.otsb-button-solid:hover {
+                        {% if block.settings.button_animation == 'sliced' or block.settings.button_animation == 'underline' %}
+                          transition-duration: 0.2s;
+                        {% else %}
+                          transition-delay: 0.5s;
+                        {% endif %}
+                          transition-property: background-color;
+                          background-color: var(--colors-button-hover);
+                          color: rgba(var(--colors-button-text-hover));
+                          background-origin: border-box;
+                      }
+                      .otsb__root .x-button-{{ block.id }} .otsb-button-action {
+                        border: none;
+                        color: rgba(var(--colors-button-text-hover));
+                        background-color: var(--colors-button-hover);
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-disable-effect, .x-button-{{ block.id }} .otsb-button.otsb-button-disable-effect {
+                        color: rgb(var(--colors-button-text));
+                        background-color: rgba(var(--colors-button));
+                      }
+                      .x-button-{{ block.id }} button.otsb-button-disable-effect:hover, .x-button-{{ block.id }} .otsb-button.otsb-button-disable-effect:hover {
+                        color: rgba(var(--colors-button-text-hover));
+                        background-color: var(--colors-button-hover);
+                      }
+                      {% if block.settings.button_animation == 'slide' or block.settings.button_animation == 'fill_up' %}
+                        .otsb__root .x-button-{{ block.id }} button.otsb-button-solid:before, .otsb__root .x-button-{{ block.id }} .otsb-button.otsb-button-solid:before {
+                          content: "";
+                          z-index: -1;
+                          position: absolute;
+                          top: 0;
+                          right: 0;
+                          bottom: 0;
+                          left: 0;
+                          width: var(--button-width);
+                          height: var(--button-height);
+                          background-color: var(--colors-button-hover);
+                          backface-visibility: hidden;
+                          will-change: transform;
+                          transform: var(--button-transform);
+                          transform-origin: var(--button-transform-origin);
+                          transition: transform 0.5s ease;
+                        }
+                        .otsb__root .x-button-{{ block.id }} button.otsb-button-solid:hover:before, .otsb__root .x-button-{{ block.id }} .otsb-button.otsb-button-solid:hover:before {
+                          transform: rotate3d(0,0,1,0) translateZ(0);
+                        }
+                      {% endif %}
+                      {% if block.settings.button_animation == 'underline' %}
+                        .otsb__root .x-button-{{ block.id }} .otsb-button-solid:hover .otsb-button-text::after {
+                          background-color: rgba(var(--colors-button-text-hover));
+                        }
+                      {% endif %}
+                    }
+                        {% endstyle %}
+                        <div class="x-button-{{ block.id }} mt-4 lg:mt-9 inline-flex flex-wrap gap-x-1.5 gap-y-2 otsb-p-break-words justify-center" {{ block.shopify_attributes }}>
+                          <a{% if block.settings.button_link_1 %} href="{{ block.settings.button_link_1 }}"{% if block.settings.open_new_window_button %} target="_blank"{% endif %}{% else %} role="link" aria-disabled="true"{% endif %} class="otsb-button button--{{ block.id }}{% if block.settings.button_primary_1 %} otsb-button-solid{% else %} otsb-button-outline{% endif %} border ml-0.5 mr-0.5 mt-0.5 mb-0.5 empty:otsb-hidden pl-6 pr-6 lg:pl-9 lg:pr-9 pt-2.5 pb-2.5 md:pt-3 md:pb-3 leading-normal{% unless block.settings.button_link_1 %} hover:cursor-not-allowed opacity-70{% endunless %}">
+                            {% render 'otsb-button-label', button_animation: block.settings.button_animation, button_label: block.settings.button_label_1, show_button_primary: block.settings.button_primary_1, custom_icon_button: block.settings.custom_icon_button %}
+                          </a>
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+      <div
+        x-data
+        id="x-hotspot-{{ section.id }}"
+        class="splider-pagination x-splide splide visible w-full otsb-page-width mx-auto absolute left-1/2 -translate-x-1/2{% if section.settings.pagination_position == 'bottom' %} bottom-0 mb-12{% elsif section.settings.pagination_position == 'top' %} top-0 mt-8{% else %} top-1/2 -translate-y-1/2{% endif %} {% if swiper_on_desktop %} xl:pl-16 xl:pr-16{% endif %}"
+        {% if swiper_on_mobile %}
+          x-intersect.once.margin.200px='$store.otsb_xSplide.load($el, {
+            "speed": 800,
+            "pauseOnFocus": false,
+            "pauseOnHover": false,
+            "perPage": 2,
+            "perMove": 2,
+            "mediaQuery": "min",
+            {% if settings.lang_direction contains request.locale.iso_code %}
+              "direction": "rtl",
+            {% endif %}
+            "breakpoints": {
+              768: {
+                {% unless swiper_on_tablet %}
+                  "destroy": true,
+                {% else %}
+                  "destroy": false,
+                {% endunless %}
+                "perPage": 3,
+                "perMove": 1
+              },
+              1024: {
+                {% if section.blocks.size < 5 %}
+                  "destroy": true,
+                {% else %}
+                  "destroy": false,
+                {% endif %}
+                "perPage": 4,
+                "perMove": 4
+              },
+              1280: {
+                {% if swiper_on_desktop %}
+                  "destroy": false,
+                {% else %}
+                  "destroy": true,
+                {% endif %}
+                {% if settings.page_width < 1200 %}
+                  "perPage": 4,
+                  "perMove": 4
+                {% else %}
+                  "perPage": 5,
+                  "perMove": 5
+                {% endif %}
+              }
+            },
+            "classes": {
+              "pagination": "hidden"
+            }
+          })'
+        {% endif %}
+      >
+        <div class="splide__track w-full mx-auto max-w-[80%] md:max-w-[90%] xl:max-w-full overflow-hidden">
+          <div class="splide__list flex flex-nowrap{% unless swiper_on_mobile %} gap-x-4{% endunless %}{% unless swiper_on_tablet %} md:gap-x-8 md:justify-center{% endunless %}{% if section.blocks.size < 5 %} lg:gap-x-12 lg:justify-center{% endif %}{% unless swiper_on_desktop %} xl:gap-x-12 xl:justify-center{% endunless %} gap-y-4">
+            {%- for block in section.blocks -%}
+              <div class="pb-1 {% if swiper_on_mobile %}splide__slide x-splide-slide w-1/2{% else %} w-full{% endif %} md:w-1/3{% unless swiper_on_tablet %} md:max-w-[180px]{% endunless %}{% if section.blocks.size > 4 %} lg:w-1/4{% else %} lg:w-1/5{% endif %}{% if swiper_on_desktop %} {% if settings.page_width >= 1200 %} xl:w-1/5{% endif %}{% else %} xl:w-1/6{% if settings.page_width >= 1600 %} xl:max-w-[160px] 2xl:max-w-[200px]{% else settings.page_width >= 1200 %} xl:max-w-[160px] 2xl:max-w-[180px]{% endif %}{% endif %} text-center" {{ block.shopify_attributes }}>
+                <button
+                  index="{{ forloop.index }}"
+                  class="x-slider-item x-hotspot otsb-p-break-words otsb-h4 otsb-text-medium slider-item{% if forloop.first %} otsb-active-hotspot{% endif %} pl-1.5 pr-1.5 lg:pl-2.5 lg:pr-2.5"
+                >
+                  <{% if block.settings.collection != blank %}a href="{{ block.settings.collection.url }}"{% else%}span{% endif %} class="otsb-pagination-link otsb-image-treatment-text inline-block otsb-p-break-words otsb-h4 relative transition duration-200">
+                    {%- if block.settings.title != blank -%}
+                      {{ block.settings.title | escape }}
+                    {%- elsif block.settings.collection != blank -%}
+                      {{ block.settings.collection.title | escape }}
+                    {%- else -%}
+                      Collection
+                    {%- endif -%}
+                  </{% if block.settings.collection != blank %}a{% else%}span{% endif %}>
+                </button>
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+        {% if swiper_on_mobile %}
+          <div class="splide__arrows{% unless swiper_on_tablet %} md:otsb-hidden{% endunless %}{% if section.blocks.size < 5 %} lg:otsb-hidden{% endif %}{% unless swiper_on_desktop %} xl:otsb-hidden{% endunless %} gap-x-1">
+            <button class="splide__arrow splide__arrow--prev otsb-image-treatment-text text-[rgba(var(--image-treatment-text))] otsb-not-icon otsb-none_border pt-3 pb-3 pl-3 pr-3 z-10 w-11 h-11 rounded-full after:text-[20px] duration-200 disabled:otsb-hidden absolute top-1/2 -translate-y-1/2{% if settings.lang_direction contains request.locale.iso_code %} right-1 md:right-3{% else %} -rotate-180 left-1 md:left-3{% endif %}" disabled aria-label="previous slide">
+              {% render 'otsb-icon-alls', icon: 'icon-arrow' %}
+            </button>
+            <button class="splide__arrow splide__arrow--next otsb-image-treatment-text text-[rgba(var(--image-treatment-text))] otsb-not-icon none_border pt-3 pb-3 pl-3 pr-3 z-10 w-11 h-11 rounded-full after:text-[20px] ml-2 duration-200 disabled:otsb-hidden absolute top-1/2 -translate-y-1/2{% if settings.lang_direction contains request.locale.iso_code %} -rotate-180 left-1 md:left-3{% else %} right-1 md:right-3{% endif %}" aria-label="previous slide">
+              {% render 'otsb-icon-alls', icon: 'icon-arrow' %}
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
