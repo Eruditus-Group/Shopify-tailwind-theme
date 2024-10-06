@@ -1,6 +1,8 @@
-{% schema %}
-  {
-    "name": "Section name",
-    "settings": []
-  }
-{% endschema %}
+{%- style -%}
+    .section-style-{{ section.id }}{
+      padding: {{ section.settings.inset_section }};
+      margin: {{ section.settings.offset_section }};
+      background:{{ section.settings.bg_section }};
+	  position: relative;
+    }
+{%- endstyle -%}
