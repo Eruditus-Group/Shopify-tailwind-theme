@@ -263,6 +263,82 @@
       "settings": {
         "section_id": "pf-9889958c"
       }
+    },
+    "index_custom_content_CtpkfM": {
+      "type": "index-custom-content",
+      "blocks": {
+        "image_JqHqgW": {
+          "type": "image",
+          "settings": {
+            "width": "50%"
+          }
+        },
+        "text_dcypX7": {
+          "type": "text",
+          "settings": {
+            "custom_class": "",
+            "caption_size": "medium",
+            "h_cpos": "start",
+            "v_cpos": "start",
+            "item_title": "<p>Caption title</p>",
+            "color_title": "#121212",
+            "item_subtitle": "<p>Caption text</p>",
+            "color_subtitle": "#121212",
+            "item_text": "<p>Caption text</p>",
+            "color_text": "#797B7E",
+            "url_text": "Shop now",
+            "item_link": "",
+            "btn_style": "btn-primary",
+            "btn_size": "btn-md",
+            "width": "50%",
+            "align_text": "left"
+          }
+        },
+        "image_R4rDhQ": {
+          "type": "image",
+          "settings": {
+            "width": "50%"
+          }
+        },
+        "text_KcPw6J": {
+          "type": "text",
+          "settings": {
+            "custom_class": "",
+            "caption_size": "medium",
+            "h_cpos": "start",
+            "v_cpos": "start",
+            "item_title": "<p>Caption title</p>",
+            "color_title": "#121212",
+            "item_subtitle": "<p>Caption text</p>",
+            "color_subtitle": "#121212",
+            "item_text": "<p>Caption text</p>",
+            "color_text": "#797B7E",
+            "url_text": "Shop now",
+            "item_link": "",
+            "btn_style": "btn-primary",
+            "btn_size": "btn-md",
+            "width": "50%",
+            "align_text": "left"
+          }
+        }
+      },
+      "block_order": [
+        "image_JqHqgW",
+        "text_dcypX7",
+        "image_R4rDhQ",
+        "text_KcPw6J"
+      ],
+      "settings": {
+        "custom_class": "",
+        "container_width": "container",
+        "reset_indent": false,
+        "inset_section": "0px 0px 0px 0px",
+        "offset_section": "0px 0px 0px 0px",
+        "bg_section": "#ffffff",
+        "use_bg_grad2": false,
+        "title": "Custom content",
+        "inverted": false
+      }
     }
   },
   "order": [
@@ -273,6 +349,7 @@
     "video",
     "multicolumn",
     "otsb_image_comparison_1_yhpD4m",
-    "pagefly_section_UFxJb3"
+    "pagefly_section_UFxJb3",
+    "index_custom_content_CtpkfM"
   ]
 }
